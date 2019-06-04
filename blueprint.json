@@ -16,14 +16,15 @@
         "patch": 0
       }
     },
-    "timestamp": "2019-06-04T13:57:24+10:00"
+    "timestamp": "2019-06-04T14:32:07+10:00"
   },
   "software": {
     "base": {
       "name": "kibana",
-      "framework": "openjdk11",
+      "framework": "node_latest",
       "deployment_type": "web",
       "http_protocol": "https_only",
+      "framework_port_override": 5601,
       "memory": {
         "required": 256,
         "recommended": 512
