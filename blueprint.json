@@ -15,12 +15,111 @@
         "level": "alpha",
         "patch": 0
       }
-    }
+    },
+    "timestamp": "2019-06-04T13:30:45+10:00"
   },
   "software": {
     "base": {
+      "name": "kibana",
+      "framework": "openjdk9",
       "deployment_type": "web",
-      "http_protocol": "https_and_http"
-    }
+      "http_protocol": "https_only",
+      "memory": {
+        "required": 256,
+        "recommended": 512
+      }
+    },
+    "scripts": {
+      "start": {
+        "language": "sh",
+        "content": "#!/bin/sh\r\nPID_FILE=/home/engines/run/kibana.pid\r\nexport PID_FILE\r\n. /home/engines/functions/trap.sh\r\n\r\ncd /home/app/kibana\r\nbin/kibana\r\nKIBANA_PID=$!\r\necho -n \"$KIBANA_PID \" > $PID_FILE\r\nstartup_complete\r\n\r\nwhile ! test -f /home/engines/run/flags/termed\r\n do\r\nsleep 3600 &\r\necho \"$KIBANA_PID \"$! > $PID_FILE\r\ndone\r\n\r\nwait\r\nshutdown_complete\r\n"
+      }
+    },
+    "installed_packages": [
+      {
+        "name": "kibana-7.1.1-linux-x86_64.tar.gz",
+        "download_type": "http(s)",
+        "source_url": "https://artifacts.elastic.co/downloads/kibana/kibana-7.1.1-linux-x86_64.tar.gz",
+        "destination": "/home/app/kibana",
+        "extraction_command": "tar -xzpf ",
+        "path_to_extracted": "kibana-7.1.1-linux-x86_64"
+      }
+    ],
+    "service_configurations": [
+      {
+        "publisher_namespace": "EnginesSystem",
+        "type_path": "filesystem/local/filesystem",
+        "variables": {
+          "service_name": "config",
+          "volume_src": "",
+          "engine_path": "",
+          "permissions": "rw",
+          "user": "_Engines_Builder(data_uid)",
+          "group": "_Engines_Builder(data_gid)",
+          "fw_user": "_Engines_Builder(cont_user_id)"
+        }
+      },
+      {
+        "publisher_namespace": "EnginesSystem",
+        "type_path": "filesystem/local/filesystem",
+        "variables": {
+          "service_name": "data",
+          "volume_src": "",
+          "engine_path": "",
+          "permissions": "rw",
+          "user": "_Engines_Builder(data_uid)",
+          "group": "_Engines_Builder(data_gid)",
+          "fw_user": "_Engines_Builder(cont_user_id)"
+        }
+      },
+      {
+        "publisher_namespace": "EnginesSystem",
+        "type_path": "filesystem/local/filesystem",
+        "variables": {
+          "service_name": "plugins",
+          "volume_src": "",
+          "engine_path": "",
+          "permissions": "rw",
+          "user": "_Engines_Builder(data_uid)",
+          "group": "_Engines_Builder(data_gid)",
+          "fw_user": "_Engines_Builder(cont_user_id)"
+        }
+      }
+    ],
+    "environment_variables": [
+      {
+        "name": "KIBANA_HOME",
+        "value": "/home/app/kibana",
+        "input": {
+          "type": "hidden"
+        }
+      }
+    ],
+    "template_files": [
+      {
+        "path": "/home/app/kibana/config/config.yaml.t",
+        "content": "elasticsearch.hosts:"
+      }
+    ],
+    "file_write_permissions": [
+      {
+        "path": "/home/app/kibana/optimize",
+        "recursive": true
+      }
+    ],
+    "persistent_directories": [
+      {
+        "path": "/home/app/kibana/config",
+        "volume_name": "config"
+      },
+      {
+        "path": "/home/app/kibana/data",
+        "volume_name": "data"
+      },
+      {
+        "path": "/home/app/kibana/plugins",
+        "volume_name": "plugins"
+      }
+    ]
   }
 }
