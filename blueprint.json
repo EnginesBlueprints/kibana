@@ -16,12 +16,12 @@
         "patch": 0
       }
     },
-    "timestamp": "2019-06-04T13:30:45+10:00"
+    "timestamp": "2019-06-04T13:57:24+10:00"
   },
   "software": {
     "base": {
       "name": "kibana",
-      "framework": "openjdk9",
+      "framework": "openjdk11",
       "deployment_type": "web",
       "http_protocol": "https_only",
       "memory": {
