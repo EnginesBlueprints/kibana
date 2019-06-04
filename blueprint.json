@@ -16,7 +16,7 @@
         "patch": 0
       }
     },
-    "timestamp": "2019-06-04T14:41:51+10:00"
+    "timestamp": "2019-06-04T14:54:48+10:00"
   },
   "software": {
     "base": {
@@ -33,7 +33,7 @@
     "scripts": {
       "start": {
         "language": "sh",
-        "content": "#!/bin/sh\r\nPID_FILE=/home/engines/run/kibana.pid\r\nexport PID_FILE\r\n. /home/engines/functions/trap.sh\r\n\r\ncd /home/app/kibana\r\nbin/kibana\r\nKIBANA_PID=$!\r\necho -n \"$KIBANA_PID \" > $PID_FILE\r\nstartup_complete\r\n\r\nwhile ! test -f /home/engines/run/flags/termed\r\n do\r\nsleep 3600 &\r\necho \"$KIBANA_PID \"$! > $PID_FILE\r\ndone\r\n\r\nwait\r\nshutdown_complete\r\n"
+        "content": "#!/bin/sh\r\nPID_FILE=/home/engines/run/kibana.pid\r\nexport PID_FILE\r\n. /home/engines/functions/trap.sh\r\n\r\ncd /home/app/kibana\r\nbin/kibana\r\nKIBANA_PID=$!\r\necho -n \"$KIBANA_PID \" > $PID_FILE\r\nstartup_complete\r\n\r\nwhile ! test -f /home/engines/run/flags/termed\r\n do\r\nsleep 3600 &\r\nwait\r\necho \"$KIBANA_PID \"$! > $PID_FILE\r\ndone\r\n\r\nwait\r\nshutdown_complete\r\n"
       }
     },
     "installed_packages": [
