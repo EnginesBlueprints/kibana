@@ -18,11 +18,11 @@
     },
     "software": {
       "display": {
-        "title": "Kibana ldap",
-        "description": "Kibana with ldap access to Elastic search Professional version"
+        "title": "Kibana",
+        "description": "Kibana"
       }
     },
-    "timestamp": "2019-07-04T14:11:35+10:00"
+    "timestamp": "2019-07-04T18:39:33+10:00"
   },
   "software": {
     "base": {
