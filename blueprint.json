@@ -16,7 +16,13 @@
         "patch": 0
       }
     },
-    "timestamp": "2019-06-04T15:22:24+10:00"
+    "software": {
+      "display": {
+        "title": "Kibana ldap",
+        "description": "Kibana with ldap access to Elastic search Professional version"
+      }
+    },
+    "timestamp": "2019-07-04T14:11:35+10:00"
   },
   "software": {
     "base": {
@@ -34,6 +40,9 @@
       "start": {
         "language": "sh",
         "content": "#!/bin/sh\r\nPID_FILE=/home/engines/run/kibana.pid\r\nexport PID_FILE\r\n. /home/engines/functions/trap.sh\r\n\r\ncd /home/app/kibana\r\nbin/kibana\r\nKIBANA_PID=$!\r\necho -n \"$KIBANA_PID \" > $PID_FILE\r\nstartup_complete\r\n\r\nwhile ! test -f /home/engines/run/flags/termed\r\n do\r\nsleep 3600 &\r\nwait\r\necho \"$KIBANA_PID \"$! > $PID_FILE\r\ndone\r\n\r\nwait\r\nshutdown_complete\r\n"
+      },
+      "install": {
+        "content": "#!/bin/sh\r\n\r\necho $username > /home/app/c/username\r\necho $password > /home/app/c/password\r\n\r\n cat /home/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml\r\n \r\n"
       }
     },
     "installed_packages": [
@@ -96,24 +105,60 @@
         }
       },
       {
-        "name": "elasticsearch_host",
+        "name": "elasticsearch_uri",
         "value": "http://elasticsearch.engines.internal:9200",
         "mandatory": true,
         "ask_at_build_time": true,
         "input": {
           "type": "string"
         }
+      },
+      {
+        "name": "elastic_name",
+        "mandatory": true,
+        "immutable": true,
+        "input": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "username",
+        "mandatory": true,
+        "immutable": true,
+        "ask_at_build_time": true,
+        "build_time_only": true,
+        "input": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "password",
+        "mandatory": true,
+        "immutable": true,
+        "ask_at_build_time": true,
+        "build_time_only": true,
+        "input": {
+          "type": "password_with_confirmation"
+        }
       }
     ],
     "template_files": [
       {
-        "path": "/home/app/kibana/config/kibana.yml",
-        "content": "# Kibana is served by a back end server. This setting specifies the port to use.\r\n#server.port: 5601\r\n\r\n# Specifies the address to which the Kibana server will bind. IP addresses and host names are both valid values.\r\n# The default is 'localhost', which usually means remote machines will not be able to connect.\r\n# To allow connections from remote users, set this parameter to a non-loopback address.\r\nserver.host: \"0.0.0.0\"\r\n\r\n# Enables you to specify a path to mount Kibana at if you are running behind a proxy.\r\n# Use the `server.rewriteBasePath` setting to tell Kibana if it should remove the basePath\r\n# from requests it receives, and to prevent a deprecation warning at startup.\r\n# This setting cannot end in a slash.\r\n#server.basePath: \"\"\r\n\r\n# Specifies whether Kibana should rewrite requests that are prefixed with\r\n# `server.basePath` or require that they are rewritten by your reverse proxy.\r\n# This setting was effectively always `false` before Kibana 6.3 and will\r\n# default to `true` starting in Kibana 7.0.\r\nserver.rewriteBasePath: false\r\n\r\n# The maximum payload size in bytes for incoming server requests.\r\n#server.maxPayloadBytes: 1048576\r\n\r\n# The Kibana server's name.  This is used for display purposes.\r\nserver.name: \"_Engines_Builder(engine_name)\"\r\n\r\n# The URLs of the Elasticsearch instances to use for all your queries.\r\nelasticsearch.hosts: [\"_Engines_Environment(elasticsearch_host)\"]\r\n\r\n# When this setting's value is true Kibana uses the hostname specified in the server.host\r\n# setting. When the value of this setting is false, Kibana uses the hostname of the host\r\n# that connects to this Kibana instance.\r\n#elasticsearch.preserveHost: true\r\n\r\n# Kibana uses an index in Elasticsearch to store saved searches, visualizations and\r\n# dashboards. Kibana creates a new index if the index doesn't already exist.\r\n#kibana.index: \".kibana\"\r\n\r\n# The default application to load.\r\n#kibana.defaultAppId: \"home\"\r\n\r\n# If your Elasticsearch is protected with basic authentication, these settings provide\r\n# the username and password that the Kibana server uses to perform maintenance on the Kibana\r\n# index at startup. Your Kibana users still need to authenticate with Elasticsearch, which\r\n# is proxied through the Kibana server.\r\n#elasticsearch.username: \"user\"\r\n#elasticsearch.password: \"pass\"\r\n\r\n# Enables SSL and paths to the PEM-format SSL certificate and SSL key files, respectively.\r\n# These settings enable SSL for outgoing requests from the Kibana server to the browser.\r\n#server.ssl.enabled: false\r\n#server.ssl.certificate: /path/to/your/server.crt\r\n#server.ssl.key: /path/to/your/server.key\r\n\r\n# Optional settings that provide the paths to the PEM-format SSL certificate and key files.\r\n# These files validate that your Elasticsearch backend uses the same key files.\r\n#elasticsearch.ssl.certificate: /path/to/your/client.crt\r\n#elasticsearch.ssl.key: /path/to/your/client.key\r\n\r\n# Optional setting that enables you to specify a path to the PEM file for the certificate\r\n# authority for your Elasticsearch instance.\r\n#elasticsearch.ssl.certificateAuthorities: [ \"/path/to/your/CA.pem\" ]\r\n\r\n# To disregard the validity of SSL certificates, change this setting's value to 'none'.\r\n#elasticsearch.ssl.verificationMode: full\r\n\r\n# Time in milliseconds to wait for Elasticsearch to respond to pings. Defaults to the value of\r\n# the elasticsearch.requestTimeout setting.\r\n#elasticsearch.pingTimeout: 1500\r\n\r\n# Time in milliseconds to wait for responses from the back end or Elasticsearch. This value\r\n# must be a positive integer.\r\n#elasticsearch.requestTimeout: 30000\r\n\r\n# List of Kibana client-side headers to send to Elasticsearch. To send *no* client-side\r\n# headers, set this value to [] (an empty list).\r\n#elasticsearch.requestHeadersWhitelist: [ authorization ]\r\n\r\n# Header names and values that are sent to Elasticsearch. Any custom headers cannot be overwritten\r\n# by client-side headers, regardless of the elasticsearch.requestHeadersWhitelist configuration.\r\n#elasticsearch.customHeaders: {}\r\n\r\n# Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable.\r\n#elasticsearch.shardTimeout: 30000\r\n\r\n# Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying.\r\n#elasticsearch.startupTimeout: 5000\r\n\r\n# Logs queries sent to Elasticsearch. Requires logging.verbose set to true.\r\n#elasticsearch.logQueries: false\r\n\r\n# Specifies the path where Kibana creates the process ID file.\r\n#pid.file: /var/run/kibana.pid\r\n\r\n# Enables you specify a file where Kibana stores log output.\r\n#logging.dest: stdout\r\n\r\n# Set the value of this setting to true to suppress all logging output.\r\n#logging.silent: false\r\n\r\n# Set the value of this setting to true to suppress all logging output other than error messages.\r\n#logging.quiet: false\r\n\r\n# Set the value of this setting to true to log all events, including system usage information\r\n# and all requests.\r\n#logging.verbose: false\r\n\r\n# Set the interval in milliseconds to sample system and process performance\r\n# metrics. Minimum is 100ms. Defaults to 5000.\r\n#ops.interval: 5000\r\n\r\n# Specifies locale to be used for all localizable strings, dates and number formats.\r\n#i18n.locale: \"en\"\r\n\r\n"
+        "path": "/home/app/templates/kibana.yml",
+        "content": "# Kibana is served by a back end server. This setting specifies the port to use.\r\n#server.port: 5601\r\n\r\n# Specifies the address to which the Kibana server will bind. IP addresses and host names are both valid values.\r\n# The default is 'localhost', which usually means remote machines will not be able to connect.\r\n# To allow connections from remote users, set this parameter to a non-loopback address.\r\nserver.host: \"0.0.0.0\"\r\n\r\n# Enables you to specify a path to mount Kibana at if you are running behind a proxy.\r\n# Use the `server.rewriteBasePath` setting to tell Kibana if it should remove the basePath\r\n# from requests it receives, and to prevent a deprecation warning at startup.\r\n# This setting cannot end in a slash.\r\n#server.basePath: \"\"\r\n\r\n# Specifies whether Kibana should rewrite requests that are prefixed with\r\n# `server.basePath` or require that they are rewritten by your reverse proxy.\r\n# This setting was effectively always `false` before Kibana 6.3 and will\r\n# default to `true` starting in Kibana 7.0.\r\nserver.rewriteBasePath: false\r\n\r\n# The maximum payload size in bytes for incoming server requests.\r\n#server.maxPayloadBytes: 1048576\r\n\r\n# The Kibana server's name.  This is used for display purposes.\r\nserver.name: \"_Engines_Builder(engine_name)\"\r\n\r\n# The URLs of the Elasticsearch instances to use for all your queries.\r\nelasticsearch.hosts: [\"_Engines_Environment(elasticsearch_uri)\"]\r\n\r\n# When this setting's value is true Kibana uses the hostname specified in the server.host\r\n# setting. When the value of this setting is false, Kibana uses the hostname of the host\r\n# that connects to this Kibana instance.\r\n#elasticsearch.preserveHost: true\r\n\r\n# Kibana uses an index in Elasticsearch to store saved searches, visualizations and\r\n# dashboards. Kibana creates a new index if the index doesn't already exist.\r\n#kibana.index: \".kibana\"\r\n\r\n# The default application to load.\r\n#kibana.defaultAppId: \"home\"\r\n\r\n# If your Elasticsearch is protected with basic authentication, these settings provide\r\n# the username and password that the Kibana server uses to perform maintenance on the Kibana\r\n# index at startup. Your Kibana users still need to authenticate with Elasticsearch, which\r\n# is proxied through the Kibana server.\r\nelasticsearch.username: \"USERNAME\"\r\nelasticsearch.password: \"PASSWORD\"\r\n\r\n# Enables SSL and paths to the PEM-format SSL certificate and SSL key files, respectively.\r\n# These settings enable SSL for outgoing requests from the Kibana server to the browser.\r\n#server.ssl.enabled: false\r\n#server.ssl.certificate: /path/to/your/server.crt\r\n#server.ssl.key: /path/to/your/server.key\r\n\r\n# Optional settings that provide the paths to the PEM-format SSL certificate and key files.\r\n# These files validate that your Elasticsearch backend uses the same key files.\r\n#elasticsearch.ssl.certificate: /path/to/your/client.crt\r\n#elasticsearch.ssl.key: /path/to/your/client.key\r\n\r\n# Optional setting that enables you to specify a path to the PEM file for the certificate\r\n# authority for your Elasticsearch instance.\r\n#elasticsearch.ssl.certificateAuthorities: [ \"/path/to/your/CA.pem\" ]\r\n\r\n# To disregard the validity of SSL certificates, change this setting's value to 'none'.\r\n#elasticsearch.ssl.verificationMode: full\r\n\r\n# Time in milliseconds to wait for Elasticsearch to respond to pings. Defaults to the value of\r\n# the elasticsearch.requestTimeout setting.\r\n#elasticsearch.pingTimeout: 1500\r\n\r\n# Time in milliseconds to wait for responses from the back end or Elasticsearch. This value\r\n# must be a positive integer.\r\n#elasticsearch.requestTimeout: 30000\r\n\r\n# List of Kibana client-side headers to send to Elasticsearch. To send *no* client-side\r\n# headers, set this value to [] (an empty list).\r\n#elasticsearch.requestHeadersWhitelist: [ authorization ]\r\n\r\n# Header names and values that are sent to Elasticsearch. Any custom headers cannot be overwritten\r\n# by client-side headers, regardless of the elasticsearch.requestHeadersWhitelist configuration.\r\n#elasticsearch.customHeaders: {}\r\n\r\n# Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable.\r\n#elasticsearch.shardTimeout: 30000\r\n\r\n# Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying.\r\n#elasticsearch.startupTimeout: 5000\r\n\r\n# Logs queries sent to Elasticsearch. Requires logging.verbose set to true.\r\n#elasticsearch.logQueries: false\r\n\r\n# Specifies the path where Kibana creates the process ID file.\r\n#pid.file: /var/run/kibana.pid\r\n\r\n# Enables you specify a file where Kibana stores log output.\r\n#logging.dest: stdout\r\n\r\n# Set the value of this setting to true to suppress all logging output.\r\n#logging.silent: false\r\n\r\n# Set the value of this setting to true to suppress all logging output other than error messages.\r\n#logging.quiet: false\r\n\r\n# Set the value of this setting to true to log all events, including system usage information\r\n# and all requests.\r\n#logging.verbose: false\r\n\r\n# Set the interval in milliseconds to sample system and process performance\r\n# metrics. Minimum is 100ms. Defaults to 5000.\r\n#ops.interval: 5000\r\n\r\n# Specifies locale to be used for all localizable strings, dates and number formats.\r\n#i18n.locale: \"en\"\r\n\r\n"
       }
     ],
     "file_write_permissions": [
       {
         "path": "/home/app/kibana/optimize",
+        "recursive": true
+      },
+      {
+        "path": "/home/app/templates",
+        "recursive": true
+      },
+      {
+        "path": "/home/app/c",
         "recursive": true
       }
     ],
@@ -129,6 +174,37 @@
       {
         "path": "/home/app/kibana/plugins",
         "volume_name": "plugins"
+      }
+    ],
+    "actionators": [
+      {
+        "name": "create_kibana_yml",
+        "return_type": "none",
+        "script": {
+          "content": " #!/bin/sh\r\n \r\n password=`cat /home/app/c/password`\r\n username=`cat /home/app/c/username`\r\n \r\n cat /home/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml"
+        }
+      },
+      {
+        "name": "set_credentials",
+        "return_type": "none",
+        "variables": [
+          {
+            "name": "username",
+            "mandatory": true,
+            "input": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "input": {
+              "type": "password_with_confirmation"
+            }
+          }
+        ],
+        "script": {
+          "content": "#!/bin/sh\r\n\r\necho $username > /home/app/c/username\r\necho $password > /home/app/c/password\r\n\r\ncat /home/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml\r\n \r\n"
+        }
       }
     ]
   }
