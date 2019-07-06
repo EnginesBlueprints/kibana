@@ -22,7 +22,7 @@
         "description": "Kibana"
       }
     },
-    "timestamp": "2019-07-04T18:39:33+10:00"
+    "timestamp": "2019-07-06T17:23:49+10:00"
   },
   "software": {
     "base": {
@@ -42,7 +42,7 @@
         "content": "#!/bin/sh\r\nPID_FILE=/home/engines/run/kibana.pid\r\nexport PID_FILE\r\n. /home/engines/functions/trap.sh\r\n\r\ncd /home/app/kibana\r\nbin/kibana\r\nKIBANA_PID=$!\r\necho -n \"$KIBANA_PID \" > $PID_FILE\r\nstartup_complete\r\n\r\nwhile ! test -f /home/engines/run/flags/termed\r\n do\r\nsleep 3600 &\r\nwait\r\necho \"$KIBANA_PID \"$! > $PID_FILE\r\ndone\r\n\r\nwait\r\nshutdown_complete\r\n"
       },
       "install": {
-        "content": "#!/bin/sh\r\n\r\necho $username > /home/app/c/username\r\necho $password > /home/app/c/password\r\n\r\n cat /home/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml\r\n \r\n"
+        "content": "#!/bin/sh\r\n\r\necho $username > /home/app/c/username\r\necho $password > /home/app/c/password\r\n\r\n cat /home/engines/templates/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml\r\n \r\n"
       }
     },
     "installed_packages": [
@@ -66,7 +66,8 @@
           "permissions": "rw",
           "user": "_Engines_Builder(data_uid)",
           "group": "_Engines_Builder(data_gid)",
-          "fw_user": "_Engines_Builder(cont_user_id)"
+          "fw_user": "_Engines_Builder(cont_user_id)",
+          "exclude_from_backup": "false"
         }
       },
       {
@@ -79,7 +80,8 @@
           "permissions": "rw",
           "user": "_Engines_Builder(data_uid)",
           "group": "_Engines_Builder(data_gid)",
-          "fw_user": "_Engines_Builder(cont_user_id)"
+          "fw_user": "_Engines_Builder(cont_user_id)",
+          "exclude_from_backup": "false"
         }
       },
       {
@@ -92,7 +94,8 @@
           "permissions": "rw",
           "user": "_Engines_Builder(data_uid)",
           "group": "_Engines_Builder(data_gid)",
-          "fw_user": "_Engines_Builder(cont_user_id)"
+          "fw_user": "_Engines_Builder(cont_user_id)",
+          "exclude_from_backup": "false"
         }
       }
     ],
@@ -181,7 +184,7 @@
         "name": "create_kibana_yml",
         "return_type": "none",
         "script": {
-          "content": " #!/bin/sh\r\n \r\n password=`cat /home/app/c/password`\r\n username=`cat /home/app/c/username`\r\n \r\n cat /home/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml"
+          "content": " #!/bin/sh\r\n \r\n password=`cat /home/app/c/password`\r\n username=`cat /home/app/c/username`\r\n \r\n cat /home/engines/templates/app/templates/kibana.yml | sed \"/USERNAME/s//$username/\" | sed \"/PASSWORD/s//$password/\"  > /home/app/kibana/config/kibana.yml"
         }
       },
       {
